@@ -1,44 +1,35 @@
 #!/usr/bin/python3
-"""Export data from an API to CSV format.
+
 """
-import csv
-import requests
+Python script that exports data inaCSV format
+"""
+
+from requests import get
 from sys import argv
+import csv
 
-if __name__ == '__main__':
-    # Checks if the argument can be converted to a number
-    try:
-        emp_id = int(argv[1])
-    except ValueError:
-        exit()
+if __name__ == "__main__":
+    response = get('https://jsonplaceholder.typicode.com/todos/')
+    data = response.json()
 
-    # Main formatted names to API uris and filenames
-    api_url = 'https://jsonplaceholder.typicode.com'
-    user_uri = '{api}/users/{id}'.format(api=api_url, id=emp_id)
-    todo_uri = '{user_uri}/todos'.format(user_uri=user_uri)
-    filename = '{emp_id}.csv'.format(emp_id=emp_id)
+    row = []
+    response2 = get('https://jsonplaceholder.typicode.com/users')
+    data2 = response2.json()
 
-    # User Response
-    res = requests.get(user_uri).json()
+    for i in data2:
+        if i['id'] == int(argv[1]):
+            employee = i['username']
 
-    # Username of the employee
-    username = res.get('username')
+    with open(argv[1] + '.csv', 'w', newline='') as file:
+        writ = csv.writer(file, quoting=csv.QUOTE_ALL)
 
-    # User TODO Response
-    res = requests.get(todo_uri).json()
+        for i in data:
 
-    # Create the new file for the user to save the information
-    # Filename example: `{user_id}.csv`
-    with open(filename, 'w', encoding='utf-8') as csvfile:
-        writer = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_ALL)
+            row = []
+            if i['userId'] == int(argv[1]):
+                row.append(i['userId'])
+                row.append(employee)
+                row.append(i['completed'])
+                row.append(i['title'])
 
-        for elem in res:
-            # Completed or non-completed task
-            status = elem.get('completed')
-
-            # The task name
-            title = elem.get('title')
-
-            # Writing each result of API response in a row of a CSV file
-            writer.writerow([emp_id, username, status, title])
-
+                writ.writerow(row)
