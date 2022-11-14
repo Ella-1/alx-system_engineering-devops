@@ -1,4 +1,8 @@
 0x15. API
+Python
+Scripting
+Back-end
+API
 Tasks
 0. Gather data from an API
 mandatory
